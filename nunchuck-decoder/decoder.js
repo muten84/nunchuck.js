@@ -1,6 +1,8 @@
 var center = 128;
 var currentX = center;
 var currentY = center;
+var def_threshholdX = 142-center;
+var def_threshholdY = 138-center;
 var lastXEvent = "";
 var lastYEvent = "";
 var ZEROG_VOLTAGE=1.65;
@@ -147,7 +149,7 @@ NunchuckDecoder.prototype.start = function(cb){
 
 
   this.decodeY = function(newY){
-    var diffY = newY - (center+(device.threshholdY||def_threshholdY));
+    var diffY = newY - (center+(decoder.threshholdY||def_threshholdY));
     var yEvent;
     if(diffY==0 || diffY==-1){
       yEvent = 'center';
@@ -164,7 +166,7 @@ NunchuckDecoder.prototype.start = function(cb){
   }
 
   this.decodeX = function(newX){
-    var diffX = newX - (center+(device.threshholdX||def_threshholdX));
+    var diffX = newX - (center+(decoder.threshholdX||def_threshholdX));
     var xEvent;
     if(diffX==0 || diffX ==-1){
       xEvent = 'center';

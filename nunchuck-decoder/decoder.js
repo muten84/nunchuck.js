@@ -22,6 +22,7 @@ var NunchuckDecoder = function(device){
 
 NunchuckDecoder.prototype.start = function(cb){
   var decoder = this;
+  var device = this.device;
   this.device.start(function(data){
       var decoded = decoder.decode(data);
       cb(decoded);

@@ -22,7 +22,6 @@ var NunchuckDecoder = function(device){
 
 NunchuckDecoder.prototype.start = function(cb){
   var decoder = this;
-  var device = this.device;
   this.device.start(function(data){
       var decoded = decoder.decode(data);
       cb(decoded);
@@ -39,22 +38,22 @@ NunchuckDecoder.prototype.start = function(cb){
       read[i] = buffer.readUInt8(i);
     }
 
-    values[0] = device.decodeX(read[0]);
-    values[1] = device.decodeY(read[1]);
-    values[2] = device.decodeC(read[2]);
-    values[3] = device.decodeZ(read[3]);
+    values[0] = decoder.decodeX(read[0]);
+    values[1] = decoder.decodeY(read[1]);
+    values[2] = decoder.decodeC(read[2]);
+    values[3] = decoder.decodeZ(read[3]);
     var currAx = read[4];
     var currAy = read[5];
     var currAz = read[6];
     //values[4] =  currAx;
     //values[5] = device.decodeAxAvg(currAx);
-    var motion= device.decodeMotion(currAx,currAy,currAz);
-    values[4] = device.decodeAxG(currAx);
-    values[5] = device.decodeAxAngle(device.decodeAxG(currAx),motion)
+    var motion= decoder.decodeMotion(currAx,currAy,currAz);
+    values[4] = decoder.decodeAxG(currAx);
+    values[5] = decoder.decodeAxAngle(device.decodeAxG(currAx),motion)
     //values[5] = device.decodeAxAngle2(currAy,currAz);
-    values[6] = device.decodeAx(currAx);
-    values[7] = device.decodeAy(currAy);
-    values[8] = device.decodeAz(currAz);
+    values[6] = decoder.decodeAx(currAx);
+    values[7] = decoder.decodeAy(currAy);
+    values[8] = decoder.decodeAz(currAz);
 
     return values;
   }

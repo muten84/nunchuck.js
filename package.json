@@ -1,0 +1,25 @@
+{
+  "name": "nunchuck-js",
+  "version": "0.0.1",
+  "description": "Nunchuck.js library that provides a lot of nunchuck modules",
+  "dependencies": {
+    "i2c-bus": ">=1.0.0"
+    },
+  "main": "index.js",
+  "license": "MIT",
+  "keywords": [
+    "nunchuck",
+    "iot",
+    "wii",
+    "i2c"
+  ],
+  "author": {
+    "name": "Luigi Bifulco",
+    "email": "bifulcoluigi@gmail.com",
+    "url": "http://www.luigibifulco.it"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/muten84/nunchuck.js"
+  }
+}

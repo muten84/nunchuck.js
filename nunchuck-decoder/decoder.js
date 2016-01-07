@@ -22,6 +22,40 @@ var NunchuckDecoder = function(device){
   this.device = device;
 }
 
+NunchuckDecoder.prototype.asObject(values){
+  var o = {};
+  var stick = {};
+  stick.xDirection = values[0];
+  stick.yDirection = values[1];
+  stick.x = 0;
+  stick.y = 0;
+
+  var buttons = {};
+  buttons.C = values[2];
+  buttons.Z = values[3];
+
+  var accelerometer = {};
+  accelerometer.aX = 0;
+  accelerometer.aY = 0;
+  accelerometer.aZ = 0;
+
+  var motion = {};
+  motion .accel = 0;
+  motion .tilt = "";
+
+  var rotation = {};
+  rotation.x = 0;
+  rotation.y = 0;
+  rotation.z = 0;
+
+  o["stick"] =  stick;
+  o["buttons"] =  stick;
+  o["accelerometer"] =  stick;
+  o["motion"] =  stick;
+  o["rotation"] =  stick;
+  return o;
+}
+
 NunchuckDecoder.prototype.start = function(cb){
   var decoder = this;
   this.device.start(function(data){

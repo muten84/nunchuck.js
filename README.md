@@ -68,14 +68,21 @@ var message = {
   }
   buttons:{
     C: //['idle','pressed']
-    Z://['idle','pressed']
+    Z: //['idle','pressed']
   },
   accelerometer:{
-    aX:
-    aY:
-    aZ:
+    aX: //single X axis acceleration value
+    aY: //single Y axis acceleration value
+    aZ: //single Z axis acceleration value
   },
-  motion:{},
-  rotation{}
+  motion:{
+    accel: // total acceleration from 3 axes
+    tilt: ,//['left', 'right', 'up', 'down']
+  },
+  rotation{
+    x: // x rotation angle in radians (roll)
+    y: // y rotation angle in radians (pitch)
+    z: // z rotation angle in radians (yaw)
+  }
 }
 ```

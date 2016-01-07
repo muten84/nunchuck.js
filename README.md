@@ -1,6 +1,6 @@
 # nunchuck.js
 Node.js module for nunchuck controller device. Provides a device object and a decoder object.
-The device object enalbes to receive raw data. A typical usage could be:
+The device object enables to receive raw data. A typical usage could be:
 
 ```
   var nunchuckModules = require('nunchuck-js').nunchuck;
@@ -20,13 +20,11 @@ The device object enalbes to receive raw data. A typical usage could be:
 ```
 ### The device object:
 The NunchuckDevice constructor takes 3 parameters:
- - The address od the device (typically 0x52);
+ - The address of the device (typically 0x52);
  - The request frequency in milliseconds ( 10 => request every 10 ms)
  - An array of values to calibrate the device, if empty will be used default values: [thresholdX, threshoholdY];
  
-The start method takes a callback function in input. The callback will be invoked at the requested frequency. 
-
-The data object is an array of length = 7, the value mapping is:
+The start method takes a callback function in input. The callback will be invoked at the requested frequency, every time the callback is invoked new data are passed in a data object. The data object is an array of length = 7, the value mapping is:
   
  - data[0] X axis of the stick, contains a number value [min=0, max=255];
  - data[1] Y axis of the stick, contains a number value [min=0, max=255];
@@ -51,8 +49,8 @@ The decoder object wraps a device object and decode raw data in an human readabl
   }
 ```
 
-###Values returned by the decoder:
-Decoder send data in an array of values. The decoder has an utility method to transform the array in a generic JSON object:
+###Process values returned by the decoder:
+Decoder sends data in an array. The decoder has an utility method (asObject) to transform the array in a generic JSON object:
 ```
   decoder.start(function(stream){
     var obj = decoder.asObject(stream);
@@ -63,8 +61,10 @@ Here is the spec of the returned JSON object:
 ```
 var message = {
   stick: {
-    x: //['left','center','up']
-    y: //['up','center','down']
+    xDirection: //['left','center','up']
+    yDirection:: //['up','center','down']
+    x: //single X stick direction value
+    y: //single Y stick direction value
   }
   buttons:{
     C: //['idle','pressed']

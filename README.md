@@ -61,28 +61,28 @@ Here is the spec of the returned JSON object:
 ```
 var message = {
   stick: {
-    xDirection: //['left','center','up']
-    yDirection:: //['up','center','down']
-    x: //single X stick direction value
-    y: //single Y stick direction value
+    xDirection: ,//['left','center','up']
+    yDirection:: ,//['up','center','down']
+    x: ,//single X stick direction value
+    y: ,//single Y stick direction value
   }
   buttons:{
-    C: //['idle','pressed']
-    Z: //['idle','pressed']
+    C: ,//['idle','pressed']
+    Z: ,//['idle','pressed']
   },
   accelerometer:{
-    aX: //single X axis acceleration value
-    aY: //single Y axis acceleration value
-    aZ: //single Z axis acceleration value
+    aX: ,//single X axis acceleration value
+    aY: ,//single Y axis acceleration value
+    aZ: ,//single Z axis acceleration value
   },
   motion:{
-    accel: // total acceleration from 3 axes
+    accel: ,// total acceleration from 3 axes
     tilt: ,//['left', 'right', 'up', 'down']
   },
-  rotation{
-    x: // x rotation angle in radians (roll)
-    y: // y rotation angle in radians (pitch)
-    z: // z rotation angle in radians (yaw)
+  rotation:{
+    x: ,// x rotation angle in radians (roll)
+    y: ,// y rotation angle in radians (pitch)
+    z: ,// z rotation angle in radians (yaw)
   }
 }
 ```

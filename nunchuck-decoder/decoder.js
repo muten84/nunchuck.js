@@ -27,32 +27,32 @@ NunchuckDecoder.prototype.asObject(values){
   var stick = {};
   stick.xDirection = values[0];
   stick.yDirection = values[1];
-  stick.x = 0;
-  stick.y = 0;
+  stick.x = values[11];
+  stick.y = values[12];
 
   var buttons = {};
   buttons.C = values[2];
   buttons.Z = values[3];
 
   var accelerometer = {};
-  accelerometer.aX = 0;
-  accelerometer.aY = 0;
-  accelerometer.aZ = 0;
+  accelerometer.aX = values[4];
+  accelerometer.aY = values[5];
+  accelerometer.aZ = values[6];
 
   var motion = {};
-  motion .accel = 0;
-  motion .tilt = "";
+  motion.accel = values[13];
+  motion.tilt = values[10];
 
   var rotation = {};
-  rotation.x = 0;
-  rotation.y = 0;
-  rotation.z = 0;
+  rotation.x = values[7];
+  rotation.y = values[8];
+  rotation.z = values[9];
 
   o["stick"] =  stick;
-  o["buttons"] =  stick;
-  o["accelerometer"] =  stick;
-  o["motion"] =  stick;
-  o["rotation"] =  stick;
+  o["buttons"] =  buttons;
+  o["accelerometer"] =  accelerometer;
+  o["motion"] =  motion;
+  o["rotation"] = rotation;
   return o;
 }
 
@@ -81,16 +81,21 @@ NunchuckDecoder.prototype.start = function(cb){
     var currAx = read[4];
     var currAy = read[5];
     var currAz = read[6];
-    //values[4] =  currAx;
-    //values[5] = device.decodeAxAvg(currAx);
-    var motion= decoder.decodeMotion(currAx,currAy,currAz);
-    values[4] = decoder.decodeAxG(currAx);
-    values[5] = decoder.decodeAxAngle(decoder.decodeAxG(currAx),motion)
-    //values[5] = device.decodeAxAngle2(currAy,currAz);
-    values[6] = decoder.decodeAx(currAx);
-    values[7] = decoder.decodeAy(currAy);
-    values[8] = decoder.decodeAz(currAz);
-
+    var motion= decoder.decodeMotion(currAx,currAy,currAz);  
+    values[4] = decoder.decodeAx(currAx);
+    values[5] = decoder.decodeAy(currAy);
+    values[6] = decoder.decodeAz(currAz);
+    values[7] = decoder.decodeAngle(decoder.decodeAccelInG(currAx),motion);
+    values[8] = decoder.decodeAngle(decoder.decodeAccelInG(currAy),motion);
+    values[9] = decoder.decodeAngle(decoder.decodeAccelInG(currAz),motion);
+    var tilt = decoder.decodeLRTilt(currAx);
+    if(tilt==="idle"){
+      tilt = decoder.decodeUDTilt(currAy)
+    }
+    values[10] = tilt;
+    values[11] = read[0];
+    values[12] = read[1];
+    values[13] = motion;
     return values;
   }
 
@@ -109,7 +114,7 @@ NunchuckDecoder.prototype.start = function(cb){
     return mAccel;
   }
 
-  this.decodeAxG = function(newAx){
+  this.decodeAccelInG = function(newAx){
     var voltsAx	= newAx * 3.3 / 255;
     var deltaVoltsAx = voltsAx - ZEROG_VOLTAGE;
     var AXg = deltaVoltsAx / SENSITIVITY;
@@ -117,20 +122,10 @@ NunchuckDecoder.prototype.start = function(cb){
   }
 
   //source http://www.starlino.com/imu_guide.html
-  this.decodeAxAngle = function(axg,r){
-    var radians = Math.acos(axg/r)
-    return (radians*180)/3.14;
-  }
-
-  this.decodeAxAngle2 = function(newAy,newAz){
-    var y_val = newAy;
-    var z_val = newAz;
-    var y2 = (y_val*y_val);
-    var z2 = (z_val*z_val);
-    //X Axis
-    var result=Math.sqrt(y2+z2);
-    var radians=Math.atan(result);
-    return (radians*180)/3.14;
+  this.decodeAngle = function(ag,r){
+    var radians = Math.acos(ag/r)
+    return radians;
+    //return (radians*180)/3.14;
   }
 
   this.decodeAxAvg = function(newAx){
@@ -146,31 +141,40 @@ NunchuckDecoder.prototype.start = function(cb){
     return aXAverage;
   }
 
-  this.decodeAx= function(newAx){
-    var toRet = "" ;
-    if(newAx === 0){
+  this.decodeLRTilt(newAx){
+    if(newAx === 0 && !(lastAxValue==='tilt-left')){
         toRet= "tilt-left";
         lastAxValue = newAx;
         return toRet;
     }
-    if(newAx === 255){
+    else if(newAx === 255 && !(lastAxValue==='tilt-right')){
         toRet= "tilt-right";
         lastAxValue = newAx;
         return toRet;
     }
+    else{
+      return "idle";
+    }
+  }
+
+  this.decodeUDTilt(newAy){
+    if(newAy === 0 && !(lastAyValue==='tilt-down')){
+        toRet= "tilt-down";
+        lastAyValue = newAy;
+        return toRet;
+    }
+    else if(newAy === 255 && !(lastAxValue==='tilt-up')){
+        toRet= "tilt-up";
+        lastAxValue = newAy;
+        return toRet;
+    }
+    else{
+      return "idle";
+    }
+  }
+
+  this.decodeAx= function(newAx){
     return newAx;
-    // var diffAx = newAx - lastAxValue;
-    // if(diffAx===0){
-    //   toRet= newAx;
-    // }
-    // if(diffAx<0){
-    //   toRet= diffAx;
-    // }
-    // if(diffAx>0){
-    //   toRet= diffAx;
-    // }
-    // lastAxValue = newAx;
-    //return toRet;
   }
 
   this.decodeAy= function(newAy){

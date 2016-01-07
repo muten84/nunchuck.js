@@ -18,6 +18,12 @@ The device object enalbes to receive raw data. A typical usage could be:
   });
   
 ```
+The NunchuckDevice constructor takes 3 parameters:
+ - The address od the device (typically 0x52);
+ - The frequency in milliseconds
+ - An array of threshold values: [thresholdX, threshoholdY], 
+ 
+The start method takes a function in input that will be invoked every, 
 
 The decoder object wrap a device object and decode raw data in an human readable way. Below a typical example usage:
 ```

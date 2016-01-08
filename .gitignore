@@ -1,4 +1,6 @@
 # Windows image file caches
+coverage
+node_modules
 Thumbs.db
 ehthumbs.db
 

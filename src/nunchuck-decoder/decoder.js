@@ -1,10 +1,8 @@
 var center = 128;
-var currentX = center;
-var currentY = center;
-var def_threshholdX = 142-center;
-var def_threshholdY = 138-center;
-var lastXEvent = "";
-var lastYEvent = "";
+var defThreshholdX = 142-center;
+var defThreshholdY = 138-center;
+var lastXEvent = '';
+var lastYEvent = '';
 var ZEROG_VOLTAGE=1.65;
 var SENSITIVITY = 0.0188; //478.5mV/g or 0.0188 or 18mg
 var ZERO_AX = 137;
@@ -18,6 +16,7 @@ var mAccel = Math.sqrt(ZERO_AX*ZERO_AX+ZERO_AY*ZERO_AY+ZERO_AZ*ZERO_AZ);
 
 
 var NunchuckDecoder = function(device){
+
   //device should be initialized
   this.device = device;
 }
@@ -48,23 +47,23 @@ NunchuckDecoder.prototype.asObject(values){
   rotation.y = values[8];
   rotation.z = values[9];
 
-  o["stick"] =  stick;
-  o["buttons"] =  buttons;
-  o["accelerometer"] =  accelerometer;
-  o["motion"] =  motion;
-  o["rotation"] = rotation;
+  o.stick =  stick;
+  o.buttons =  buttons;
+  o.accelerometer =  accelerometer;
+  o.motion =  motion;
+  o.rotation = rotation;
   return o;
 }
 
 NunchuckDecoder.prototype.start = function(cb){
+
   var decoder = this;
   this.device.start(function(data){
-      var decoded = decoder.decode(data);
-      cb(decoded);
+    var decoded = decoder.decode(data);
+    cb(decoded);
   });
-
   this.decode = function(buffer){
-    var value = -1;
+    
     //x -y..etc
     var i = -1;
     var values = [lastXEvent,lastYEvent,'aX','aY','aZ'];
@@ -73,41 +72,46 @@ NunchuckDecoder.prototype.start = function(cb){
     for(i=0; i<buffer.length; i++){
       read[i] = buffer.readUInt8(i);
     }
-
-    values[0] = decoder.decodeX(read[0]);
-    values[1] = decoder.decodeY(read[1]);
-    values[2] = decoder.decodeC(read[2]);
-    values[3] = decoder.decodeZ(read[3]);
-    var currAx = read[4];
-    var currAy = read[5];
-    var currAz = read[6];
-    var motion= decoder.decodeMotion(currAx,currAy,currAz);  
-    values[4] = decoder.decodeAx(currAx);
-    values[5] = decoder.decodeAy(currAy);
-    values[6] = decoder.decodeAz(currAz);
-    values[7] = decoder.decodeAngle(decoder.decodeAccelInG(currAx),motion);
-    values[8] = decoder.decodeAngle(decoder.decodeAccelInG(currAy),motion);
-    values[9] = decoder.decodeAngle(decoder.decodeAccelInG(currAz),motion);
-    var tilt = decoder.decodeLRTilt(currAx);
-    if(tilt==="idle"){
-      tilt = decoder.decodeUDTilt(currAy)
-    }
-    values[10] = tilt;
-    values[11] = read[0];
-    values[12] = read[1];
-    values[13] = motion;
-    return values;
+    var toReturn = function(values){
+      values[0] = decoder.decodeX(read[0]);
+      values[1] = decoder.decodeY(read[1]);
+      values[2] = decoder.decodeC(read[2]);
+      values[3] = decoder.decodeZ(read[3]);
+      var currAx = read[4];
+      var currAy = read[5];
+      var currAz = read[6];
+      var motion= decoder.decodeMotion(currAx,currAy,currAz);
+      values[4] = decoder.decodeAx(currAx);
+      values[5] = decoder.decodeAy(currAy);
+      values[6] = decoder.decodeAz(currAz);
+      values[7] = decoder.decodeAngle(decoder.decodeAccelInG(currAx),motion);
+      values[8] = decoder.decodeAngle(decoder.decodeAccelInG(currAy),motion);
+      values[9] = decoder.decodeAngle(decoder.decodeAccelInG(currAz),motion);
+      var tilt = decoder.decodeLRTilt(currAx);
+      if(tilt==='idle'){
+        tilt = decoder.decodeUDTilt(currAy)
+      }
+      values[10] = tilt;
+      values[11] = read[0];
+      values[12] = read[1];
+      values[13] = motion;
+      return values;
+    }(values);
+    return toReturn;
   }
 
   this.decodeC = function(newC){
-    return newC == 0?"pressed":"idle";
+
+    return newC === 0?'pressed':'idle';
   }
 
   this.decodeZ = function(newZ){
-    return newZ == 0?"pressed":"idle";
+
+    return newZ === 0?'pressed':'idle';
   }
 
   this.decodeMotion = function(newX,newY,newZ){
+
     var s = newX*newX + newY*newY + newZ*newZ;
     var mAccelCurrent = Math.sqrt(s);
     mAccel = (mAccel * 0.9) + (mAccelCurrent * 0.1);
@@ -115,6 +119,7 @@ NunchuckDecoder.prototype.start = function(cb){
   }
 
   this.decodeAccelInG = function(newAx){
+
     var voltsAx	= newAx * 3.3 / 255;
     var deltaVoltsAx = voltsAx - ZEROG_VOLTAGE;
     var AXg = deltaVoltsAx / SENSITIVITY;
@@ -123,12 +128,14 @@ NunchuckDecoder.prototype.start = function(cb){
 
   //source http://www.starlino.com/imu_guide.html
   this.decodeAngle = function(ag,r){
+
     var radians = Math.acos(ag/r)
     return radians;
     //return (radians*180)/3.14;
   }
 
   this.decodeAxAvg = function(newAx){
+
     var newAxAvg = aXAverage;
     aXBuffer[axIdx] = newAx;
     axIdx++;
@@ -142,54 +149,60 @@ NunchuckDecoder.prototype.start = function(cb){
   }
 
   this.decodeLRTilt(newAx){
-    if(newAx === 0 && !(lastAxValue==='tilt-left')){
-        toRet= "tilt-left";
-        lastAxValue = newAx;
-        return toRet;
+
+    if(newAx === 0 && lastAxValue!=='tilt-left'){
+      toRet= 'tilt-left';
+      lastAxValue = newAx;
+      return toRet;
     }
-    else if(newAx === 255 && !(lastAxValue==='tilt-right')){
-        toRet= "tilt-right";
-        lastAxValue = newAx;
-        return toRet;
+    else if(newAx === 255 && lastAxValue!=='tilt-right'){
+      toRet= 'tilt-right';
+      lastAxValue = newAx;
+      return toRet;
     }
     else{
-      return "idle";
+      return 'idle';
     }
   }
 
   this.decodeUDTilt(newAy){
-    if(newAy === 0 && !(lastAyValue==='tilt-down')){
-        toRet= "tilt-down";
-        lastAyValue = newAy;
-        return toRet;
+
+    if(newAy === 0 && lastAyValue!=='tilt-down'){
+      toRet= 'tilt-down';
+      lastAyValue = newAy;
+      return toRet;
     }
-    else if(newAy === 255 && !(lastAxValue==='tilt-up')){
-        toRet= "tilt-up";
-        lastAxValue = newAy;
-        return toRet;
+    else if(newAy === 255 && lastAxValue!=='tilt-up'){
+      toRet= 'tilt-up';
+      lastAxValue = newAy;
+      return toRet;
     }
     else{
-      return "idle";
+      return 'idle';
     }
   }
 
   this.decodeAx= function(newAx){
+
     return newAx;
   }
 
   this.decodeAy= function(newAy){
+
     return newAy;
   }
 
   this.decodeAz= function(newAz){
+
     return newAz;
   }
 
 
   this.decodeY = function(newY){
-    var diffY = newY - (center+(decoder.threshholdY||def_threshholdY));
+
+    var diffY = newY - (center+(decoder.threshholdY||defThreshholdY));
     var yEvent;
-    if(diffY==0 || diffY==-1){
+    if(diffY===0 || diffY===-1){
       yEvent = 'center';
     }
     else if(diffY>=0){
@@ -204,9 +217,10 @@ NunchuckDecoder.prototype.start = function(cb){
   }
 
   this.decodeX = function(newX){
-    var diffX = newX - (center+(decoder.threshholdX||def_threshholdX));
+
+    var diffX = newX - (center+(decoder.threshholdX||defThreshholdX));
     var xEvent;
-    if(diffX==0 || diffX ==-1){
+    if(diffX===0 || diffX ===-1){
       xEvent = 'center';
     }
     else if(diffX>=0){

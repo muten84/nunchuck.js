@@ -1,21 +1,34 @@
-var i2c = require('i2c-bus');
+var i2c = null;
+try{
+  i2c = require('i2c-bus');
+}catch(err){
+  console.error(err);
+}
 var NUNCHUCK_DEVICE = 0x52;
 
-
 function NunchuckDevice(address, frequency, thresholds){
-  this.address = address;
+  this.address = address || NUNCHUCK_DEVICE;
   this.threshholdX = thresholds[0];
   this.threshholdY = thresholds[1];
   this.frequency = frequency;
   this.started = null;
-  this.bus = "Bus not initialized";
+  this.bus = 'Bus not initialized';
+  this.status = 'created';
 }
 
+NunchuckDevice.prototype.getStatus = function(){
+  return this.status;
+};
+
 NunchuckDevice.prototype.init = function(busNumber){
+  if(i2c == null){
+    throw 'Error i2c bus not initialized!';
+  }
   this.bus = i2c.openSync(busNumber || 1);
   this.bus.i2cWriteSync(this.address, 2, new Buffer([0xF0, 0x55]));
   this.bus.i2cWriteSync(this.address, 2, new Buffer([0xFB, 0x00]));
   this.bus.i2cWriteSync(this.address, 2, new Buffer([0x40, 0x00]));
+  this.status = 'initialized';
 }
 
 NunchuckDevice.prototype.start = function(ondata){
@@ -35,9 +48,9 @@ NunchuckDevice.prototype.start = function(ondata){
     parsed[4] = ((buffer[2]) << 2); //aX;
     parsed[5] = ((buffer[3]) << 2); //aY;
     parsed[6] = ((buffer[4]) << 2); //aZ;
-    if ((buffer[5] & 0x01)!=0) {parsed[3] = 1; }
+    if ((buffer[5] & 0x01)!==0) {parsed[3] = 1; }
     else { parsed[3] = 0; }
-    if ((buffer[5] & 0x02)!=0){ parsed[2] = 1; }
+    if ((buffer[5] & 0x02)!==0){ parsed[2] = 1; }
     else { parsed[2] = 0; }
     parsed[4] = ((buffer[5] >>2) & 0x03) | parseInt(buffer[2]);
     parsed[5] = ((buffer[5] >>4) & 0x03) | parseInt(buffer[3]);

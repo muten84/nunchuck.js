@@ -1,5 +1,5 @@
-var device = require('./nunchuck-i2c/nunchuck');
-var decoder = require('./nunchuck-decoder/decoder');
+var device = require('./src/nunchuck-i2c/nunchuck');
+var decoder = require('./src/nunchuck-decoder/decoder');
 var nunchuck = {};
 nunchuck.device = device;
 nunchuck.decoder = decoder;

@@ -16,6 +16,9 @@ function rewireI2C(thisBus){
   i2cBus.i2cReadSync = function(addr,length,buffer){
     console.log('i2cReadSync: '+addr,length,buffer);
   }
+  i2cBus.closeSync = function(){
+    console.log('closeSync: ');
+  }
 
   i2c.openSync = function(bus){
     console.log('open sync bus: '+bus);

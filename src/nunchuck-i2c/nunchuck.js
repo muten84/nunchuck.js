@@ -21,17 +21,20 @@ NunchuckDevice.prototype.getStatus = function(){
 };
 
 NunchuckDevice.prototype.init = function(busNumber){
-  if(i2c == null){
-    throw 'Error i2c bus not initialized!';
+  if(i2c === null || i2c === 'undefined'){
+    throw new Error('Error i2c bus not initialized!');
   }
   this.bus = i2c.openSync(busNumber || 1);
   this.bus.i2cWriteSync(this.address, 2, new Buffer([0xF0, 0x55]));
   this.bus.i2cWriteSync(this.address, 2, new Buffer([0xFB, 0x00]));
   this.bus.i2cWriteSync(this.address, 2, new Buffer([0x40, 0x00]));
-  this.status = 'initialized';
+  this.status = 'connected';
 }
 
 NunchuckDevice.prototype.start = function(ondata){
+  if(ondata === null || ondata === 'undefined'){
+    throw new Error('Error: Please provide a callback function in input to receive data;');
+  }
   var buffer = new Buffer(6);
   var device = this;
   this.started = setInterval(function(){
@@ -57,9 +60,13 @@ NunchuckDevice.prototype.start = function(ondata){
     parsed[6] = ((buffer[5] >>6) & 0x03) | parseInt(buffer[4]);
     return parsed;
   }
+  if(this.started!=='undefined'){
+    this.status = 'started';
+  }
 }
 
 NunchuckDevice.prototype.stop = function(){
+  this.status = 'stopped';
   clearInterval(this.started);
   this.bus.closeSync();
 }

@@ -1,6 +1,7 @@
 # Windows image file caches
 coverage
 node_modules
+out
 Thumbs.db
 ehthumbs.db
 

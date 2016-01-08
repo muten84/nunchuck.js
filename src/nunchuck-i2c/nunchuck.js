@@ -32,11 +32,14 @@ NunchuckDevice.prototype.init = function(busNumber){
 }
 
 NunchuckDevice.prototype.start = function(ondata){
+  var device = this;
   if(ondata === null || ondata === 'undefined'){
     throw new Error('Error: Please provide a callback function in input to receive data;');
   }
+  if(device.getStatus()!=='connected'){
+    throw new Error('Device not connected! Please initialize it...')
+  }
   var buffer = new Buffer(6);
-  var device = this;
   this.started = setInterval(function(){
     device.bus.i2cWriteSync(device.address, 1, new Buffer([0x00]));
     device.bus.i2cReadSync(device.address, 6, buffer);

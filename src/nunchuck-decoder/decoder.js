@@ -16,12 +16,15 @@ var mAccel = Math.sqrt(ZERO_AX*ZERO_AX+ZERO_AY*ZERO_AY+ZERO_AZ*ZERO_AZ);
 
 
 var NunchuckDecoder = function(device){
-
   //device should be initialized
   this.device = device;
 }
 
-NunchuckDecoder.prototype.asObject(values){
+NunchuckDecoder.prototype.getDevice = function(){
+    return this.device;
+}
+
+NunchuckDecoder.prototype.asObject = function(values){
   var o = {};
   var stick = {};
   stick.xDirection = values[0];
@@ -56,14 +59,14 @@ NunchuckDecoder.prototype.asObject(values){
 }
 
 NunchuckDecoder.prototype.start = function(cb){
-
   var decoder = this;
+
   this.device.start(function(data){
     var decoded = decoder.decode(data);
     cb(decoded);
   });
   this.decode = function(buffer){
-    
+
     //x -y..etc
     var i = -1;
     var values = [lastXEvent,lastYEvent,'aX','aY','aZ'];
@@ -148,7 +151,7 @@ NunchuckDecoder.prototype.start = function(cb){
     return aXAverage;
   }
 
-  this.decodeLRTilt(newAx){
+  this.decodeLRTilt = function(newAx){
 
     if(newAx === 0 && lastAxValue!=='tilt-left'){
       toRet= 'tilt-left';
@@ -165,7 +168,7 @@ NunchuckDecoder.prototype.start = function(cb){
     }
   }
 
-  this.decodeUDTilt(newAy){
+  this.decodeUDTilt = function(newAy){
 
     if(newAy === 0 && lastAyValue!=='tilt-down'){
       toRet= 'tilt-down';

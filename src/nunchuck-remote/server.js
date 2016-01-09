@@ -1,12 +1,12 @@
-var device = require('../nunchuck-i2c/nunchuck');
-var decoder = require('../nunchuck-decoder/decoder');
+var NunchuckDevice = require('../nunchuck-i2c/nunchuck');
+var NunchuckDecoder = require('../nunchuck-decoder/decoder');
 var connect = require('connect');
 var createStatic = require('connect-static');
 var app = connect();
 var path = require('path');
 var WebSocketServer = require('websocket').server;
 
-var nunchuck = new NunchuckDevice(NUNCHUCK_ADDRESS, 10,[threshholdX,threshholdY]);
+var nunchuck = new NunchuckDevice(0x52, 60,[]);
 
 var dir = path.join(__dirname, "public");
 createStatic({dir: dir}, function(err, middleware) {
@@ -24,11 +24,7 @@ wsServer.on('request', function(request) {
 
     connection.on('open', function(connection) {
         console.log("connection open", connection);
-        nunchuck.init();
-        var decoder = new NunchuckDecoder(nunchuck);
-        decoder.start(function(stream){
-          connection.sendUTF(decoder.asObject(stream));
-        })
+
     });
 
     // This is the most important callback for us, we'll handle
@@ -36,7 +32,14 @@ wsServer.on('request', function(request) {
     connection.on('message', function(message) {
         console.log(message);
         if (message.type === 'utf8') {
-
+          nunchuck.init();
+          console.log("nunchuck initialized....");
+          var decoder = new NunchuckDecoder(nunchuck);
+          console.log("decoder started....");
+          decoder.start(function(stream){
+            console.log(decoder.asObject(stream));
+            connection.sendUTF(JSON.stringify(decoder.asObject(stream)));
+          });
         }
     });
 

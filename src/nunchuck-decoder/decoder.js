@@ -17,6 +17,7 @@ var mAccel = Math.sqrt(ZERO_AX*ZERO_AX+ZERO_AY*ZERO_AY+ZERO_AZ*ZERO_AZ);
 
 var NunchuckDecoder = function(device){
   //device should be initialized
+  console.log('Using device: '+device);
   this.device = device;
 }
 
@@ -60,11 +61,10 @@ NunchuckDecoder.prototype.asObject = function(values){
 
 NunchuckDecoder.prototype.start = function(cb){
   var decoder = this;
-
-  this.device.start(function(data){
-    var decoded = decoder.decode(data);
-    cb(decoded);
-  });
+  // console.log(">>>>"+device.getStatus());
+  if(decoder.device.getStatus()!=='connected'){
+    throw new Error('Device MUST be initialized before decoder can use it!');
+  }
   this.decode = function(buffer){
 
     //x -y..etc
@@ -236,6 +236,11 @@ NunchuckDecoder.prototype.start = function(cb){
     }
     return xEvent;
   }
+
+  decoder.device.start(function(data){
+    var decoded = decoder.decode(data);
+    cb(decoded);
+  });
 }
 
 module.exports = NunchuckDecoder;

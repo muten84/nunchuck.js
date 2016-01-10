@@ -1,12 +1,12 @@
 {
   "name": "nunchuck-js",
-  "version": "1.1.1",
+  "version": "1.2.0",
   "description": "Nunchuck.js library that provides a lot of nunchuck modules",
   "dependencies": {
     "i2c-bus": ">=1.0.0",
     "connect": ">=3.4.0",
     "connect-static": ">=1.5.1",
-    "websocket":">=1.0.22"
+    "websocket": ">=1.0.22"
   },
   "devDependencies": {
     "jshint": ">=2.8.0",

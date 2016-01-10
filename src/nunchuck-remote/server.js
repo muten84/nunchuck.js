@@ -6,7 +6,7 @@ var app = connect();
 var path = require('path');
 var WebSocketServer = require('websocket').server;
 
-var nunchuck = new NunchuckDevice(0x52, 60,[]);
+var nunchuck = new NunchuckDevice(0x52, 1,[]);
 
 var dir = path.join(__dirname, "public");
 createStatic({dir: dir}, function(err, middleware) {
@@ -37,8 +37,9 @@ wsServer.on('request', function(request) {
           var decoder = new NunchuckDecoder(nunchuck);
           console.log("decoder started....");
           decoder.start(function(stream){
-            console.log(decoder.asObject(stream));
-            connection.sendUTF(JSON.stringify(decoder.asObject(stream)));
+            var obj = decoder.asObject(stream);
+            console.log(obj);
+            connection.sendUTF(JSON.stringify(obj));
           });
         }
     });
@@ -46,7 +47,7 @@ wsServer.on('request', function(request) {
     connection.on('close', function(connection) {
         // close user connection
         console.log("connection close", connection);
-        nunchuck.close();
+        nunchuck.stop();
     });
 });
 

@@ -4,11 +4,12 @@ var defThreshholdY = 138-center;
 var lastXEvent = '';
 var lastYEvent = '';
 var ZEROG_VOLTAGE=1.65;
-var SENSITIVITY = 0.0098; //478.5mV/g or 0.0188 or 18mg
-var ZERO_AX = 137;
-var ZERO_AY = 135;
+var SENSITIVITY = 0.0068; //478.5mV/g or 0.0188 or 18mg
+var ZERO_AX = 129;
+var ZERO_AY = 143;
 var ZERO_AZ = 175;
 var lastAxValue = ZERO_AX;
+var lastAyValue = ZERO_AY;
 var axIdx = 0;
 var aXAverage = ZERO_AX;
 var aXBuffer = [];
@@ -175,9 +176,9 @@ NunchuckDecoder.prototype.start = function(cb){
       lastAyValue = newAy;
       return toRet;
     }
-    else if(newAy === 255 && lastAxValue!=='tilt-up'){
+    else if(newAy === 255 && lastAyValue!=='tilt-up'){
       toRet= 'tilt-up';
-      lastAxValue = newAy;
+      lastAyValue = newAy;
       return toRet;
     }
     else{
